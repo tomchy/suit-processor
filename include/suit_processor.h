@@ -54,8 +54,8 @@ struct suit_manifest_state {
 	struct zcbor_string invoke_seq;
 	enum suit_seq_status invoke_seq_status;
 
-	struct zcbor_string text_seq;
-	enum suit_seq_status text_seq_status;
+	struct zcbor_string text;
+	enum suit_seq_status text_status;
 };
 
 #endif /* SUIT_PROCESSOR_H__ */

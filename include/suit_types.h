@@ -15,8 +15,8 @@
 
 #define SUIT_MAX_NUM_SIGNERS 2  ///! The maximum number of signers.
 #define SUIT_MAX_NUM_COMPONENT_ID_PARTS 5  ///! The maximum number of bytestrings in a component ID.
-#define SUIT_MAX_NUM_COMPONENTS 6  ///! The maximum number of components referenced in the manifest.
-#define SUIT_MAX_NUM_COMPONENT_PARAMS (SUIT_MAX_NUM_COMPONENTS * SUIT_MAX_MANIFEST_DEPTH) ///! The maximum number of active components during processing dependency manifests.
+#define SUIT_MANIFEST_MAX_NUM_COMPONENTS 6  ///! The maximum number of components referenced in the manifest.
+#define SUIT_MAX_NUM_COMPONENT_PARAMS (SUIT_MANIFEST_MAX_NUM_COMPONENTS * SUIT_MAX_MANIFEST_DEPTH) ///! The maximum number of active components during processing dependency manifests.
 #define SUIT_MAX_NUM_INTEGRATED_PAYLOADS 5  ///! The maximum number of integrated payloads in a single manifest.
 #define SUIT_MAX_COMMAND_ARGS 3  ///! The maximum number of arguments consumed by a single command.
 #define SUIT_SUIT_SIG_STRUCTURE1_MAX_LENGTH 55  ///! The maximum length of the Sig_structure1 structure. Current value allows to store only 256-bit long digests.
@@ -163,7 +163,7 @@ struct suit_seq_exec_state {
 	int retval; ///! Value returned by the nested command sequence execution.
 	const uint8_t * exec_ptr; ///! The pointer within the currently executed command sequence, pointing to the current command in the sequence.
 	size_t current_component_idx; ///! In case of nested command execution - the currently selected component from the component list.
-	bool current_components_backup[SUIT_MAX_NUM_COMPONENTS]; //! List of components, selected before the execution of command sequences.
+	bool current_components_backup[SUIT_MANIFEST_MAX_NUM_COMPONENTS]; //! List of components, selected before the execution of command sequences.
 };
 
 struct suit_processor_state {
@@ -182,8 +182,8 @@ struct suit_processor_state {
 	enum suit_bool dry_run;
 #endif /* SUIT_PLATFORM_DRY_RUN_SUPPORT */
 	size_t num_components;
-	bool current_components[SUIT_MAX_NUM_COMPONENTS];
-	struct suit_manifest_params components[SUIT_MAX_NUM_COMPONENTS];
+	bool current_components[SUIT_MANIFEST_MAX_NUM_COMPONENTS];
+	struct suit_manifest_params components[SUIT_MANIFEST_MAX_NUM_COMPONENTS];
 	size_t seq_stack_height;
 	struct suit_seq_exec_state seq_stack[SUIT_MAX_SEQ_DEPTH];
 };

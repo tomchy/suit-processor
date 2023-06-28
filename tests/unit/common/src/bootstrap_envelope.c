@@ -34,7 +34,7 @@ void bootstrap_envelope_empty(struct suit_processor_state *state)
 	unseverable->_SUIT_Unseverable_Members_suit_invoke_present = false;
 
 	/* Disable all components. */
-	for (int i = 0; i < SUIT_MAX_NUM_COMPONENTS; i++) {
+	for (int i = 0; i < SUIT_MANIFEST_MAX_NUM_COMPONENTS; i++) {
 		state->current_components[i] = false;
 	}
 

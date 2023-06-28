@@ -49,7 +49,7 @@ void suit_reset_state(struct suit_processor_state *state)
 #ifdef SUIT_PLATFORM_LEGACY_API_SUPPORT
 	suit_plat_reset_components();
 #else /* SUIT_PLATFORM_LEGACY_API_SUPPORT */
-	for (size_t i = 0; i < SUIT_MAX_NUM_COMPONENTS; i++) {
+	for (size_t i = 0; i < SUIT_MANIFEST_MAX_NUM_COMPONENTS; i++) {
 		if (state->components[i].component_handle) {
 			(void)suit_plat_release_component_handle(state->components[i].component_handle);
 		}
@@ -491,7 +491,7 @@ int suit_validate_manifest(struct suit_processor_state *state)
 		struct zcbor_string component_id;
 
 		/* Verify the length of the list */
-		if (common->_SUIT_Common_suit_components._SUIT_Common_suit_components._SUIT_Components__SUIT_Component_Identifier_count > SUIT_MAX_NUM_COMPONENTS) {
+		if (common->_SUIT_Common_suit_components._SUIT_Common_suit_components._SUIT_Components__SUIT_Component_Identifier_count > SUIT_MANIFEST_MAX_NUM_COMPONENTS) {
 			return SUIT_ERR_MANIFEST_VALIDATION;
 		}
 

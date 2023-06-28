@@ -46,13 +46,13 @@ void test_params_init_invalid_input(void)
 {
 	int ret = SUIT_SUCCESS;
 
-	ret = suit_manifest_params_init(NULL, SUIT_MAX_NUM_COMPONENTS);
+	ret = suit_manifest_params_init(NULL, SUIT_MANIFEST_MAX_NUM_COMPONENTS);
 	TEST_ASSERT_EQUAL_MESSAGE(SUIT_ERR_CRASH, ret, "Initialization with NULL pointer returned unexpected value");
 
 	ret = suit_manifest_params_init((struct suit_manifest_params *)&components, 0);
 	TEST_ASSERT_EQUAL_MESSAGE(SUIT_ERR_CRASH, ret, "Initialization with too small memory returned unexpected value");
 
-	ret = suit_manifest_params_init((struct suit_manifest_params *)&components, SUIT_MAX_NUM_COMPONENTS);
+	ret = suit_manifest_params_init((struct suit_manifest_params *)&components, SUIT_MANIFEST_MAX_NUM_COMPONENTS);
 	TEST_ASSERT_EQUAL_MESSAGE(SUIT_ERR_ORDER, ret, "Initialization of already initialized module returned unexpected value");
 }
 
@@ -175,7 +175,7 @@ void test_append_component_fill_array(void)
 	/* Verify that the test boundaries can be reached. */
 	TEST_ASSERT_LESS_THAN_MESSAGE(
 		sizeof("TEST_COMPONENT_0123456789abcdef67890") - sizeof("TEST_COMPONENT_0"),
-		SUIT_MAX_NUM_COMPONENTS,
+		SUIT_MANIFEST_MAX_NUM_COMPONENTS,
 		"Unable to reach maximum number of components. Please extend the component ID generator"
 	);
 
@@ -186,7 +186,7 @@ void test_append_component_fill_array(void)
 	);
 
 	/* Fill the component array. */
-	for (size_t i = 0; i < SUIT_MAX_NUM_COMPONENTS; i++) {
+	for (size_t i = 0; i < SUIT_MANIFEST_MAX_NUM_COMPONENTS; i++) {
 		component_handle = i;
 		sample_component_0.len = strlen("TEST_COMPONENT_0") + i;
 
@@ -211,8 +211,8 @@ void test_append_component_fill_array(void)
 	}
 
 	/* Verify that the manifest component array is full. */
-	component_handle = SUIT_MAX_NUM_COMPONENTS;
-	sample_component_0.len = strlen("TEST_COMPONENT_0") + SUIT_MAX_NUM_COMPONENTS;
+	component_handle = SUIT_MANIFEST_MAX_NUM_COMPONENTS;
+	sample_component_0.len = strlen("TEST_COMPONENT_0") + SUIT_MANIFEST_MAX_NUM_COMPONENTS;
 
 	ret = suit_manifest_append_component(&manifest, &sample_component_0);
 	TEST_ASSERT_EQUAL_MESSAGE(SUIT_ERR_MANIFEST_VALIDATION, ret, "Manifest capacity reached, but the new component was added");
@@ -234,7 +234,7 @@ void test_append_component_fill_array(void)
 	/* Fill half of the array with the same IDs, using the second manifest,
 	 * so that should result in the increased reference counters.
 	 */
-	for (size_t i = 0; i < (SUIT_MAX_NUM_COMPONENTS / 2); i++) {
+	for (size_t i = 0; i < (SUIT_MANIFEST_MAX_NUM_COMPONENTS / 2); i++) {
 		component_handle = i;
 		sample_component_0.len = strlen("TEST_COMPONENT_0") + i;
 
@@ -255,7 +255,7 @@ void test_append_component_fill_array(void)
 	}
 
 	/* Reach the boundaries of component params storage using single, flakey slot of the submanifest. */
-	for (size_t i = SUIT_MAX_NUM_COMPONENTS; i < SUIT_MAX_NUM_COMPONENT_PARAMS; i++) {
+	for (size_t i = SUIT_MANIFEST_MAX_NUM_COMPONENTS; i < SUIT_MAX_NUM_COMPONENT_PARAMS; i++) {
 		component_handle = i;
 		sample_component_0.len = strlen("TEST_COMPONENT_0") + i;
 
@@ -267,7 +267,7 @@ void test_append_component_fill_array(void)
 		TEST_ASSERT_EQUAL_MESSAGE(SUIT_SUCCESS, ret, "Unable to append a new component to submanifest");
 
 		/* Verify the component mapping. */
-		TEST_ASSERT_EQUAL_MESSAGE(SUIT_MAX_NUM_COMPONENTS / 2 + 1, sub_manifest.components_count, "The manifest component counter was not increased");
+		TEST_ASSERT_EQUAL_MESSAGE(SUIT_MANIFEST_MAX_NUM_COMPONENTS / 2 + 1, sub_manifest.components_count, "The manifest component counter was not increased");
 		TEST_ASSERT_EQUAL_MESSAGE(i, sub_manifest.component_map[sub_manifest.components_count - 1], "Unexpected value of the component mapping");
 
 		/* Verify the contents of the created component. */
@@ -293,7 +293,7 @@ void test_append_component_fill_array(void)
 	TEST_ASSERT_EQUAL_MESSAGE(SUIT_ERR_OVERFLOW, ret, "Parameters capacity reached, but a new component was added");
 
 	/* Verify that it is still possible to assign existing components to manifests. */
-	for (size_t i = (SUIT_MAX_NUM_COMPONENTS / 2); i < SUIT_MAX_NUM_COMPONENTS; i++) {
+	for (size_t i = (SUIT_MANIFEST_MAX_NUM_COMPONENTS / 2); i < SUIT_MANIFEST_MAX_NUM_COMPONENTS; i++) {
 		component_handle = i;
 		sample_component_0.len = strlen("TEST_COMPONENT_0") + i;
 
@@ -316,8 +316,8 @@ void test_append_component_fill_array(void)
 	}
 
 	/* Verify that the both arrays are full. */
-	component_handle = SUIT_MAX_NUM_COMPONENTS;
-	sample_component_0.len = strlen("TEST_COMPONENT_0") + SUIT_MAX_NUM_COMPONENTS;
+	component_handle = SUIT_MANIFEST_MAX_NUM_COMPONENTS;
+	sample_component_0.len = strlen("TEST_COMPONENT_0") + SUIT_MANIFEST_MAX_NUM_COMPONENTS;
 
 	ret = suit_manifest_append_component(&sub_manifest, &sample_component_0);
 	TEST_ASSERT_EQUAL_MESSAGE(SUIT_ERR_MANIFEST_VALIDATION, ret, "Manifest capacity reached, but the new component was added");
@@ -479,7 +479,7 @@ void test_append_dependency_fill_array(void)
 	/* Verify that the test boundaries can be reached. */
 	TEST_ASSERT_LESS_THAN_MESSAGE(
 		sizeof("TEST_COMPONENT_0123456789abcdef67890") - sizeof("TEST_COMPONENT_0"),
-		SUIT_MAX_NUM_COMPONENTS,
+		SUIT_MANIFEST_MAX_NUM_COMPONENTS,
 		"Unable to reach maximum number of components. Please extend the component ID generator"
 	);
 
@@ -490,7 +490,7 @@ void test_append_dependency_fill_array(void)
 	);
 
 	/* Fill the component array. */
-	for (size_t i = 0; i < SUIT_MAX_NUM_COMPONENTS; i++) {
+	for (size_t i = 0; i < SUIT_MANIFEST_MAX_NUM_COMPONENTS; i++) {
 		component_handle = i;
 		sample_component_0.len = strlen("TEST_COMPONENT_0") + i;
 
@@ -515,8 +515,8 @@ void test_append_dependency_fill_array(void)
 	}
 
 	/* Verify that the manifest component array is full. */
-	component_handle = SUIT_MAX_NUM_COMPONENTS;
-	sample_component_0.len = strlen("TEST_COMPONENT_0") + SUIT_MAX_NUM_COMPONENTS;
+	component_handle = SUIT_MANIFEST_MAX_NUM_COMPONENTS;
+	sample_component_0.len = strlen("TEST_COMPONENT_0") + SUIT_MANIFEST_MAX_NUM_COMPONENTS;
 
 	ret = suit_manifest_append_dependency(&manifest, &sample_component_0, &prefix);
 	TEST_ASSERT_EQUAL_MESSAGE(SUIT_ERR_MANIFEST_VALIDATION, ret, "Manifest capacity reached, but the new component was added");
@@ -740,7 +740,7 @@ void test_get_component_params(void)
 	ret = suit_manifest_get_component_params(&manifest, 0, NULL);
 	TEST_ASSERT_EQUAL_MESSAGE(SUIT_ERR_CRASH, ret, "Parameters returned to NULL pointer");
 
-	ret = suit_manifest_get_component_params(&manifest, SUIT_MAX_NUM_COMPONENTS, &params);
+	ret = suit_manifest_get_component_params(&manifest, SUIT_MANIFEST_MAX_NUM_COMPONENTS, &params);
 	TEST_ASSERT_EQUAL_MESSAGE(SUIT_ERR_MISSING_COMPONENT, ret, "Parameters returned for out-of-range component");
 
 	manifest.component_map[0] = SUIT_MAX_NUM_COMPONENT_PARAMS;

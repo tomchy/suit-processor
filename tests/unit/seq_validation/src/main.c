@@ -508,7 +508,7 @@ void test_seq_validation_command_nested_run_sequence(void)
 void test_seq_validation_shared_nested_run_sequence_multiple_components(void)
 {
 	for (size_t depth = 1; depth < (SUIT_MAX_SEQ_DEPTH - 1); depth++) {
-		for (size_t n_components = 2; n_components < SUIT_MAX_NUM_COMPONENTS; n_components++) {
+		for (size_t n_components = 2; n_components < SUIT_MANIFEST_MAX_NUM_COMPONENTS; n_components++) {
 			for (size_t i = 0; i < ZCBOR_ARRAY_SIZE(shared_support_matrix); i++) {
 				seq_validation_nested_test_template(
 					suit_validate_shared_sequence,
@@ -526,7 +526,7 @@ void test_seq_validation_shared_nested_run_sequence_multiple_components(void)
 void test_seq_validation_command_nested_run_sequence_multiple_components(void)
 {
 	for (size_t depth = 1; depth < (SUIT_MAX_SEQ_DEPTH - 1); depth++) {
-		for (size_t n_components = 2; n_components < SUIT_MAX_NUM_COMPONENTS; n_components++) {
+		for (size_t n_components = 2; n_components < SUIT_MANIFEST_MAX_NUM_COMPONENTS; n_components++) {
 			for (size_t i = 0; i < ZCBOR_ARRAY_SIZE(command_support_matrix); i++) {
 				seq_validation_nested_test_template(
 					suit_validate_command_sequence,
@@ -576,7 +576,7 @@ void test_seq_validation_command_nested_try_each(void)
 void test_seq_validation_shared_nested_try_each_multiple_components(void)
 {
 	for (size_t depth = 1; depth < (SUIT_MAX_SEQ_DEPTH - 1); depth++) {
-		for (size_t n_components = 2; n_components < SUIT_MAX_NUM_COMPONENTS; n_components++) {
+		for (size_t n_components = 2; n_components < SUIT_MANIFEST_MAX_NUM_COMPONENTS; n_components++) {
 			for (size_t i = 0; i < ZCBOR_ARRAY_SIZE(shared_support_matrix); i++) {
 				seq_validation_nested_test_template(
 					suit_validate_shared_sequence,
@@ -594,7 +594,7 @@ void test_seq_validation_shared_nested_try_each_multiple_components(void)
 void test_seq_validation_command_nested_try_each_multiple_components(void)
 {
 	for (size_t depth = 1; depth < (SUIT_MAX_SEQ_DEPTH - 1); depth++) {
-		for (size_t n_components = 2; n_components < SUIT_MAX_NUM_COMPONENTS; n_components++) {
+		for (size_t n_components = 2; n_components < SUIT_MANIFEST_MAX_NUM_COMPONENTS; n_components++) {
 			for (size_t i = 0; i < ZCBOR_ARRAY_SIZE(command_support_matrix); i++) {
 				seq_validation_nested_test_template(
 					suit_validate_command_sequence,

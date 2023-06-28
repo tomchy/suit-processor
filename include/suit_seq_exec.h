@@ -109,7 +109,7 @@ int suit_seq_exec_component_idx_get(struct suit_processor_state *state, size_t *
  *
  * @note This API is used to implement the loop, which executes nested command sequence on
  *       a list of components in a on-by-one order.
- * @note If the list of selected components is exhausted, the component_idx will be set to SUIT_MAX_NUM_COMPONENTS
+ * @note If the list of selected components is exhausted, the component_idx will be set to SUIT_MANIFEST_MAX_NUM_COMPONENTS
  *       and this API will automatically restore the list of selected components from the backup.
  *
  * @param[in]   state          The SUIT processor state to be used.

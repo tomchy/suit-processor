@@ -30,7 +30,7 @@ struct suit_manifest_state {
 	struct suit_integrated_payload integrated_payloads[SUIT_MAX_NUM_INTEGRATED_PAYLOADS];
 	size_t integrated_payloads_count;
 
-	size_t component_map[SUIT_MAX_NUM_COMPONENTS];
+	size_t component_map[SUIT_MANIFEST_MAX_NUM_COMPONENTS];
 	size_t components_count;
 
 	struct zcbor_string shared_sequence;

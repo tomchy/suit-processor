@@ -118,14 +118,14 @@ int suit_directive_try_each(struct suit_processor_state *state, struct SUIT_Dire
 	}
 
 	/* If the sequence has finished and the component list was not exhausted, reschedule the sequence. */
-	while ((retval == SUIT_SUCCESS) && (component_idx != SUIT_MAX_NUM_COMPONENTS)) {
+	while ((retval == SUIT_SUCCESS) && (component_idx != SUIT_MANIFEST_MAX_NUM_COMPONENTS)) {
 		retval = try_each(state, try_each_arg, validate);
 		/* Sequence finished - execute it for the next component. */
 		if (retval != SUIT_ERR_AGAIN) {
 			int ret = suit_seq_exec_component_idx_next(state, &component_idx);
 			if (ret != SUIT_SUCCESS) {
 				retval = ret;
-			} else if (component_idx != SUIT_MAX_NUM_COMPONENTS) {
+			} else if (component_idx != SUIT_MANIFEST_MAX_NUM_COMPONENTS) {
 				/* Reset the execution state to repeat the sequence. */
 				seq_exec_state->cmd_exec_state = SUIT_SEQ_EXEC_DEFAULT_STATE;
 			}
@@ -160,7 +160,7 @@ int suit_directive_run_sequence(struct suit_processor_state *state,
 	}
 
 	/* If the sequence has finished and the component list was not exhausted, reschedule the sequence. */
-	while ((retval == SUIT_SUCCESS) && (component_idx != SUIT_MAX_NUM_COMPONENTS)) {
+	while ((retval == SUIT_SUCCESS) && (component_idx != SUIT_MANIFEST_MAX_NUM_COMPONENTS)) {
 		if (seq_exec_state->cmd_exec_state == SUIT_SEQ_EXEC_DEFAULT_STATE) {
 			SUIT_DBG("Push the sequence to run onto the stack\r\n");
 			seq_exec_state->cmd_exec_state = 1;
@@ -173,7 +173,7 @@ int suit_directive_run_sequence(struct suit_processor_state *state,
 			int ret = suit_seq_exec_component_idx_next(state, &component_idx);
 			if (ret != SUIT_SUCCESS) {
 				seq_exec_state->retval = ret;
-			} else if (component_idx != SUIT_MAX_NUM_COMPONENTS) {
+			} else if (component_idx != SUIT_MANIFEST_MAX_NUM_COMPONENTS) {
 				/* Reset the execution state to repeat the sequence. */
 				seq_exec_state->cmd_exec_state = SUIT_SEQ_EXEC_DEFAULT_STATE;
 			}

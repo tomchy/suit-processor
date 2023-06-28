@@ -18,7 +18,7 @@ static int backup_and_reset_components(struct suit_processor_state *state)
 		return retval;
 	}
 
-	if (seq_exec_state->current_component_idx != SUIT_MAX_NUM_COMPONENTS) {
+	if (seq_exec_state->current_component_idx != SUIT_MANIFEST_MAX_NUM_COMPONENTS) {
 		SUIT_ERR("Creating backup of components is allowed only on uninitialized frames.\r\n");
 		return SUIT_ERR_ORDER;
 	}
@@ -27,8 +27,8 @@ static int backup_and_reset_components(struct suit_processor_state *state)
 		seq_exec_state->cmd_seq_str.value);
 	memcpy(&seq_exec_state->current_components_backup,
 		&state->current_components,
-		SUIT_MAX_NUM_COMPONENTS * sizeof(bool));
-	if (state->num_components > SUIT_MAX_NUM_COMPONENTS) {
+		SUIT_MANIFEST_MAX_NUM_COMPONENTS * sizeof(bool));
+	if (state->num_components > SUIT_MANIFEST_MAX_NUM_COMPONENTS) {
 		return SUIT_ERR_DECODING;
 	}
 	for (int i = 0; i < state->num_components; i++) {
@@ -49,12 +49,12 @@ static int recover_components(struct suit_processor_state *state)
 	/* Recover the list of selected components from backup. */
 	memcpy(&state->current_components,
 		&seq_exec_state->current_components_backup,
-		SUIT_MAX_NUM_COMPONENTS * sizeof(bool));
+		SUIT_MANIFEST_MAX_NUM_COMPONENTS * sizeof(bool));
 
 	SUIT_DBG("%p: Recover component list\r\n",
 		seq_exec_state->cmd_seq_str.value);
 	SUIT_DBG("%p: Selected components: ", seq_exec_state->cmd_seq_str.value);
-	for (size_t i = 0; i < SUIT_MAX_NUM_COMPONENTS; i++) {
+	for (size_t i = 0; i < SUIT_MANIFEST_MAX_NUM_COMPONENTS; i++) {
 		if (state->current_components[i]) {
 			SUIT_DBG_RAW("%d ", i);
 		}
@@ -75,7 +75,7 @@ int suit_seq_exec_schedule(struct suit_processor_state *state, struct zcbor_stri
 		state->seq_stack[state->seq_stack_height].exec_ptr = command_sequence->value;
 		state->seq_stack[state->seq_stack_height].retval = SUIT_SUCCESS;
 		state->seq_stack[state->seq_stack_height].soft_failure = soft_failure;
-		state->seq_stack[state->seq_stack_height].current_component_idx = SUIT_MAX_NUM_COMPONENTS;
+		state->seq_stack[state->seq_stack_height].current_component_idx = SUIT_MANIFEST_MAX_NUM_COMPONENTS;
 		state->seq_stack[state->seq_stack_height].n_commands = 0;
 		state->seq_stack[state->seq_stack_height].current_command = 0;
 		state->seq_stack_height += 1;
@@ -290,7 +290,7 @@ int suit_seq_exec_component_idx_get(struct suit_processor_state *state, size_t *
 	*component_idx = seq_exec_state->current_component_idx;
 
 	/* If executed for the first time - backup components and set the first active index. */
-	if (*component_idx == SUIT_MAX_NUM_COMPONENTS) {
+	if (*component_idx == SUIT_MANIFEST_MAX_NUM_COMPONENTS) {
 		retval = suit_seq_exec_component_idx_next(state, component_idx);
 	}
 
@@ -311,9 +311,9 @@ int suit_seq_exec_component_idx_next(struct suit_processor_state *state, size_t 
 	}
 
 	/* Invalidate current component index value before the loop execution. */
-	*component_idx = SUIT_MAX_NUM_COMPONENTS;
+	*component_idx = SUIT_MANIFEST_MAX_NUM_COMPONENTS;
 
-	if (seq_exec_state->current_component_idx == SUIT_MAX_NUM_COMPONENTS) {
+	if (seq_exec_state->current_component_idx == SUIT_MANIFEST_MAX_NUM_COMPONENTS) {
 		/* If executed for the first time - backup components and set the first active index. */
 		retval = backup_and_reset_components(state);
 		if (retval != SUIT_SUCCESS) {
@@ -328,9 +328,9 @@ int suit_seq_exec_component_idx_next(struct suit_processor_state *state, size_t 
 		state->current_components[seq_exec_state->current_component_idx] = false;
 	}
 
-	for (size_t i = 0; i < SUIT_MAX_NUM_COMPONENTS; i++) {
+	for (size_t i = 0; i < SUIT_MANIFEST_MAX_NUM_COMPONENTS; i++) {
 		if (seq_exec_state->current_components_backup[i]) {
-			if ((seq_exec_state->current_component_idx == SUIT_MAX_NUM_COMPONENTS) ||
+			if ((seq_exec_state->current_component_idx == SUIT_MANIFEST_MAX_NUM_COMPONENTS) ||
 			    (seq_exec_state->current_component_idx < i)) {
 				*component_idx = i;
 				break;
@@ -338,7 +338,7 @@ int suit_seq_exec_component_idx_next(struct suit_processor_state *state, size_t 
 		}
 	}
 
-	if (*component_idx != SUIT_MAX_NUM_COMPONENTS) {
+	if (*component_idx != SUIT_MANIFEST_MAX_NUM_COMPONENTS) {
 		seq_exec_state->current_component_idx = *component_idx;
 		SUIT_DBG("%p: Select component %d\r\n",
 			seq_exec_state->cmd_seq_str.value,
@@ -350,7 +350,7 @@ int suit_seq_exec_component_idx_next(struct suit_processor_state *state, size_t 
 		if (retval != SUIT_SUCCESS) {
 			return retval;
 		}
-		seq_exec_state->current_component_idx = SUIT_MAX_NUM_COMPONENTS;
+		seq_exec_state->current_component_idx = SUIT_MANIFEST_MAX_NUM_COMPONENTS;
 	}
 
 	return SUIT_SUCCESS;

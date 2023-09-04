@@ -13,6 +13,19 @@
 #include <cose_encode.h>
 #include <cose_decode.h>
 
+#include <zephyr/logging/log.h>
+#include <zephyr/logging/log_ctrl.h>
+
+LOG_MODULE_DECLARE(suit_processor, CONFIG_SUIT_LOG_LEVEL);
+
+#undef SUIT_DBG
+#define SUIT_DBG LOG_DBG
+#undef SUIT_INF
+#define SUIT_INF LOG_INF
+#undef SUIT_WRN
+#define SUIT_WRN LOG_WRN
+#undef SUIT_ERR
+#define SUIT_ERR LOG_ERR
 
 static const uint8_t suit_aad_aes256_gcm[] = {
 	0x83, /* array (3 elements) */

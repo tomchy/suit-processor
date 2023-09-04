@@ -14,6 +14,15 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#ifdef CONFIG_BOARD_NATIVE_POSIX
+#include <stdio.h>
+#define SUIT_DBG(fmt, ...) printf("<dbg> %s: "fmt, __func__, ##__VA_ARGS__)
+#define SUIT_DBG_RAW(fmt, ...) printf(""fmt, ##__VA_ARGS__)
+#define SUIT_INF(fmt, ...) printf("<inf> %s: "fmt, __func__, ##__VA_ARGS__)
+#define SUIT_WRN(fmt, ...) printf("<wrn> %s: "fmt, __func__, ##__VA_ARGS__)
+#define SUIT_ERR(fmt, ...) printf("<err> %s: "fmt, __func__, ##__VA_ARGS__)
+#endif
+
 #ifndef SUIT_DBG
 #define SUIT_DBG(...)
 #endif

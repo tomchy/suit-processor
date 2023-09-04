@@ -11,6 +11,20 @@
 #include <cose_decode.h>
 #include <suit_manifest.h>
 
+#include <zephyr/logging/log.h>
+#include <zephyr/logging/log_ctrl.h>
+
+LOG_MODULE_DECLARE(suit_processor, CONFIG_SUIT_LOG_LEVEL);
+
+#undef SUIT_DBG
+#define SUIT_DBG LOG_DBG
+#undef SUIT_INF
+#define SUIT_INF LOG_INF
+#undef SUIT_WRN
+#define SUIT_WRN LOG_WRN
+#undef SUIT_ERR
+#define SUIT_ERR LOG_ERR
+
 /** Extract the major type, i.e. the first 3 bits of the header byte. */
 #define MAJOR_TYPE(header_byte) ((zcbor_major_type_t)(((header_byte) >> 5) & 0x7))
 
@@ -117,6 +131,7 @@ static int cose_sign1_authenticate_digest(struct zcbor_string *manifest_componen
 		&signature,
 		&signed_data_size);
 	if (ret != ZCBOR_SUCCESS) {
+		SUIT_ERR("Unable to encode COSE structure");
 		return SUIT_ERR_DECODING;
 	}
 
@@ -534,6 +549,7 @@ int suit_decoder_authenticate_manifest(struct suit_decoder_state *state)
 	}
 
 	if (state->authentication_bstr_count == 0) {
+		SUIT_DBG("Authenticate unsigned manifest");
 		ret = suit_plat_authorize_unsigned_manifest(&state->decoded_manifest->manifest_component_id);
 	} else {
 		volatile enum suit_bool results[SUIT_MAX_NUM_SIGNERS * 2]; /* Use every other entry as canary */
@@ -546,6 +562,7 @@ int suit_decoder_authenticate_manifest(struct suit_decoder_state *state)
 
 		/* Iterate through (key, signature) pairs */
 		for (i = 0; i < state->authentication_bstr_count; i++) {
+			SUIT_DBG("Authenticate digest %d/%d", i, state->authentication_bstr_count);
 			ret = cose_sign1_authenticate_digest(
 				&state->decoded_manifest->manifest_component_id,
 				&state->authentication_bstr[i],
@@ -627,6 +644,9 @@ int suit_decoder_authorize_manifest(struct suit_decoder_state *state)
 
 			if (ret == SUIT_SUCCESS) {
 				ret = suit_plat_authorize_component_id(&state->decoded_manifest->manifest_component_id, &component_id);
+				SUIT_DBG("Platform-level component authorization: %d", ret);
+			} else {
+				SUIT_ERR("Unable to get component ID bstr (err: %d)", ret);
 			}
 
 			if (ret == SUIT_SUCCESS) {
@@ -642,6 +662,8 @@ int suit_decoder_authorize_manifest(struct suit_decoder_state *state)
 			/* Mask the error code, because it is allowed to have a manifest without dependencies. */
 			if (ret == SUIT_ERR_MISSING_COMPONENT) {
 				ret = SUIT_SUCCESS;
+			} else {
+				SUIT_ERR("Failed to validate dependencies (err: %d)", ret);
 			}
 		}
 	} else {
@@ -670,6 +692,7 @@ int suit_decoder_authorize_manifest(struct suit_decoder_state *state)
 		} else { \
 			state->decoded_manifest->sequence##_seq_status = UNAVAILABLE; \
 			ret = SUIT_ERR_MANIFEST_VALIDATION; \
+			SUIT_ERR("SUIT unseverable " #sequence " sequence not authenticated"); \
 		} \
 	} else { \
 		state->decoded_manifest->sequence##_seq_status = UNAVAILABLE; \
@@ -695,6 +718,7 @@ int suit_decoder_authorize_manifest(struct suit_decoder_state *state)
 				} else { \
 					state->decoded_manifest->sequence##_seq_status = UNAVAILABLE; \
 					ret = SUIT_ERR_MANIFEST_VALIDATION; \
+					SUIT_ERR("SUIT severable " #sequence " sequence digest verification failed (err: %d)", digest_ret); \
 				} \
 			} else { \
 				/* The sequence digest is present inside the manifest, but it cannot be verified, \
@@ -709,6 +733,7 @@ int suit_decoder_authorize_manifest(struct suit_decoder_state *state)
 		} else { \
 			state->decoded_manifest->sequence##_seq_status = UNAVAILABLE; \
 			ret = SUIT_ERR_MANIFEST_VALIDATION; \
+			SUIT_ERR("SUIT invalid severable " #sequence " sequence"); \
 		} \
 	} else { \
 		state->decoded_manifest->sequence##_seq_status = UNAVAILABLE; \
@@ -733,6 +758,7 @@ int suit_decoder_authorize_manifest(struct suit_decoder_state *state)
 			} else { \
 				state->decoded_manifest->sequence##_seq_status = UNAVAILABLE; \
 				ret = SUIT_ERR_MANIFEST_VALIDATION; \
+				SUIT_ERR("SUIT severable " #sequence " sequence (extension) digest verification failed (err: %d)", digest_ret); \
 			} \
 		} else { \
 			/* The sequence digest is present inside the manifest, but it cannot be verified, \
@@ -747,6 +773,7 @@ int suit_decoder_authorize_manifest(struct suit_decoder_state *state)
 	} else { \
 		state->decoded_manifest->sequence##_seq_status = UNAVAILABLE; \
 		ret = SUIT_ERR_MANIFEST_VALIDATION; \
+		SUIT_ERR("SUIT invalid severable " #sequence " sequence (extension)"); \
 	} \
 
 int suit_decoder_decode_sequences(struct suit_decoder_state *state)
@@ -768,10 +795,12 @@ int suit_decoder_decode_sequences(struct suit_decoder_state *state)
 		} else {
 			state->decoded_manifest->shared_sequence_status = UNAVAILABLE;
 			ret = SUIT_ERR_MANIFEST_VALIDATION;
+			SUIT_ERR("Obligatory shared sequence unavailable");
 		}
 	} else {
 		state->decoded_manifest->shared_sequence_status = UNAVAILABLE;
 		ret = SUIT_ERR_MANIFEST_VALIDATION;
+		SUIT_ERR("Obligatory shared sequence not present");
 	}
 
 
@@ -798,6 +827,7 @@ int suit_decoder_decode_sequences(struct suit_decoder_state *state)
 			} else {
 				state->decoded_manifest->text_status = UNAVAILABLE;
 				ret = SUIT_ERR_MANIFEST_VALIDATION;
+				SUIT_ERR("suit-text sequence digest mismatch (err: %d)", digest_ret);
 			}
 		} else {
 			/* The text digest is present inside the manifest, but it cannot be verified,
@@ -830,6 +860,7 @@ int suit_decoder_decode_sequences(struct suit_decoder_state *state)
 
 			default:
 				ret = SUIT_ERR_DECODING;
+				SUIT_ERR("Unsupported severable sequence extension: %d", ext->severable_manifest_members_choice_extensions_choice);
 				break;
 		}
 

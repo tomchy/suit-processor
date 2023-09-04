@@ -12,6 +12,19 @@
 #include <suit_manifest.h>
 #include <suit.h>
 
+#include <zephyr/logging/log.h>
+#include <zephyr/logging/log_ctrl.h>
+
+LOG_MODULE_DECLARE(suit_processor, CONFIG_SUIT_LOG_LEVEL);
+
+#undef SUIT_DBG
+#define SUIT_DBG LOG_DBG
+#undef SUIT_INF
+#define SUIT_INF LOG_INF
+#undef SUIT_WRN
+#define SUIT_WRN LOG_WRN
+#undef SUIT_ERR
+#define SUIT_ERR LOG_ERR
 
 enum comparison_type {
 	comparison_greater = SUIT_Condition_Version_Comparison_Types_suit_condition_version_comparison_greater_m_c,
@@ -111,6 +124,8 @@ int suit_condition_vendor_identifier(struct suit_processor_state *state,
 	}
 #endif /* SUIT_PLATFORM_DRY_RUN_SUPPORT */
 
+	SUIT_DBG("Check VID");
+
 	return suit_plat_check_vid(component_params->component_handle,
 				&component_params->vid);
 }
@@ -130,6 +145,8 @@ int suit_condition_class_identifier(struct suit_processor_state *state,
 	}
 #endif /* SUIT_PLATFORM_DRY_RUN_SUPPORT */
 
+	SUIT_DBG("Check CID");
+
 	return suit_plat_check_cid(component_params->component_handle,
 				&component_params->cid);
 }
@@ -148,6 +165,8 @@ int suit_condition_device_identifier(struct suit_processor_state *state,
 		return SUIT_SUCCESS;
 	}
 #endif /* SUIT_PLATFORM_DRY_RUN_SUPPORT */
+
+	SUIT_DBG("Check DID");
 
 	return suit_plat_check_did(component_params->component_handle,
 				&component_params->did);

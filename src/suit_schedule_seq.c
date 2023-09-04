@@ -207,7 +207,7 @@ static int suit_run_single_command(struct suit_processor_state *state, suit_comm
 		}
 
 		if (command->type == SUIT_COMMAND_CONDITION) {
-			SUIT_DBG("Execute condition %d for component idx: %d (manifest: %p, handle: 0x%lx)\r\n",
+			SUIT_DBG("Execute condition %d for component idx: %d (manifest: %p, handle: 0x%x)\r\n",
 				command->condition.SUIT_Condition_choice, component_idx,
 				seq_exec_state->manifest, params->component_handle);
 
@@ -249,7 +249,7 @@ static int suit_run_single_command(struct suit_processor_state *state, suit_comm
 		}
 
 		else if (command->type == SUIT_COMMAND_DIRECTIVE) {
-			SUIT_DBG("Execute directive %d for component idx: %d (manifest: %p, handle: 0x%lx)\r\n",
+			SUIT_DBG("Execute directive %d for component idx: %d (manifest: %p, handle: 0x%x)\r\n",
 				command->directive.SUIT_Directive_choice, component_idx,
 				seq_exec_state->manifest, params->component_handle);
 

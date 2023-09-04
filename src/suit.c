@@ -14,6 +14,19 @@
 static struct suit_processor_state processor_state;
 static struct suit_processor_state *state = &processor_state;
 
+#include <zephyr/logging/log.h>
+#include <zephyr/logging/log_ctrl.h>
+
+LOG_MODULE_REGISTER(suit_processor, CONFIG_SUIT_LOG_LEVEL);
+
+#undef SUIT_DBG
+#define SUIT_DBG LOG_DBG
+#undef SUIT_INF
+#define SUIT_INF LOG_INF
+#undef SUIT_WRN
+#define SUIT_WRN LOG_WRN
+#undef SUIT_ERR
+#define SUIT_ERR LOG_ERR
 
 static int suit_processor_decode_envelope(struct suit_decoder_state *decoder_state, struct suit_manifest_state *manifest,
 	const uint8_t *envelope_str, size_t envelope_len)

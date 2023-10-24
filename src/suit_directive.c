@@ -35,12 +35,12 @@ int suit_directive_set_current_components(struct suit_processor_state *state, st
 
 	/* Single component. */
 	if (index_arg->_IndexArg_choice == _IndexArg_uint) {
-		SUIT_DBG("Select single component: %d (manifest: %p)\r\n", index_arg->_IndexArg_uint, seq_exec_state->manifest);
+		SUIT_DBG("Select single component: %d (manifest: %p)\r\n", index_arg->_IndexArg_uint, (void *)seq_exec_state->manifest);
 		return suit_exec_select_component_idx(seq_exec_state, index_arg->_IndexArg_uint);
 	/* Multiple components. */
 	} else if (index_arg->_IndexArg_choice == _IndexArg__uint) {
 		for (int i = 0; i < index_arg->_IndexArg__uint_uint_count; i++) {
-			SUIT_DBG("Select component: %d (manifest: %p)\r\n", index_arg->_IndexArg__uint_uint[i], seq_exec_state->manifest);
+			SUIT_DBG("Select component: %d (manifest: %p)\r\n", index_arg->_IndexArg__uint_uint[i], (void *)seq_exec_state->manifest);
 			retval = suit_exec_select_component_idx(seq_exec_state, index_arg->_IndexArg__uint_uint[i]);
 			if (retval != SUIT_SUCCESS) {
 				SUIT_ERR("Unable to set current components: failed to select group of components (%d)\r\n", retval);
@@ -50,7 +50,7 @@ int suit_directive_set_current_components(struct suit_processor_state *state, st
 	/* All components (if true). The false value is not allowed by CDDL. */
 	} else if (index_arg->_IndexArg_choice == _IndexArg_bool) {
 		/* Enable all components. */
-		SUIT_DBG("Select all components (manifest: %p)\r\n", seq_exec_state->manifest);
+		SUIT_DBG("Select all components (manifest: %p)\r\n", (void *)seq_exec_state->manifest);
 		return suit_exec_select_all_components(seq_exec_state);
 	}
 

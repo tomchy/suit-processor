@@ -43,7 +43,7 @@ static int recover_components(struct suit_seq_exec_state *seq_exec_state)
 		&seq_exec_state->current_components_backup,
 		SUIT_MAX_NUM_COMPONENTS * sizeof(bool));
 
-	SUIT_DBG("%p: Selected components: ", seq_exec_state->cmd_seq_str.value);
+	SUIT_DBG("%p: Selected components: ", (void *)seq_exec_state->cmd_seq_str.value);
 	for (size_t i = 0; i < SUIT_MAX_NUM_COMPONENTS; i++) {
 		if (seq_exec_state->current_components[i]) {
 			SUIT_DBG_RAW("%d ", i);
@@ -148,7 +148,7 @@ int suit_seq_exec_schedule(struct suit_processor_state *state, struct suit_manif
 	}
 
 	if (state->seq_stack_height < SUIT_MAX_SEQ_DEPTH) {
-		SUIT_DBG("Push sequence: %p\r\n", command_sequence->value);
+		SUIT_DBG("Push sequence: %p\r\n", (void *)command_sequence->value);
 		struct suit_seq_exec_state *seq_exec_state = &state->seq_stack[state->seq_stack_height];
 
 		seq_exec_state->cmd_seq_str.value = command_sequence->value;
@@ -294,7 +294,7 @@ int suit_seq_exec_step(struct suit_processor_state *state)
 		else if (retval == SUIT_ERR_AGAIN) {
 			SUIT_DBG("%d: Partially processed command. Ptr: %p\r\n",
 				seq_exec_state->current_command,
-				seq_exec_state->exec_ptr);
+				(void *)seq_exec_state->exec_ptr);
 		}
 
 		return retval;
@@ -327,7 +327,7 @@ int suit_seq_exec_state_get(struct suit_processor_state *state, struct suit_seq_
 int suit_seq_exec_finalize(struct suit_processor_state *state, int retval)
 {
 	if ((state != NULL) && (state->seq_stack_height > 0)) {
-		SUIT_DBG("Finalize sequence: %p\r\n", state->seq_stack[state->seq_stack_height - 1].cmd_seq_str.value);
+		SUIT_DBG("Finalize sequence: %p\r\n", (void *)state->seq_stack[state->seq_stack_height - 1].cmd_seq_str.value);
 		if ((state->seq_stack[state->seq_stack_height - 1].soft_failure == suit_bool_true) &&
 		    (retval == SUIT_FAIL_CONDITION)) {
 			retval = SUIT_FAIL_SOFT_CONDITION;
@@ -406,7 +406,7 @@ int suit_seq_exec_component_idx_next(struct suit_seq_exec_state *seq_exec_state,
 	if (*component_idx != SUIT_MAX_NUM_COMPONENTS) {
 		seq_exec_state->current_component_idx = *component_idx;
 		SUIT_DBG("%p: Select component %d\r\n",
-			seq_exec_state->cmd_seq_str.value,
+			(void *)seq_exec_state->cmd_seq_str.value,
 			*component_idx);
 		seq_exec_state->current_components[*component_idx] = true;
 	} else {

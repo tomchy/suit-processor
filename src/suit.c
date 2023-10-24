@@ -23,12 +23,12 @@ static int suit_processor_decode_envelope(struct suit_decoder_state *decoder_sta
 	memset(manifest, 0, sizeof(*manifest));
 
 	if (ret == SUIT_SUCCESS) {
-		SUIT_DBG("Initialize decoder context with manifest: %p\r\n", manifest);
+		SUIT_DBG("Initialize decoder context with manifest: %p\r\n", (void *)manifest);
 		ret = suit_decoder_init(decoder_state, manifest);
 	}
 
 	if (ret == SUIT_SUCCESS) {
-		SUIT_DBG("Decode envelope: %p (%d)\r\n", envelope_str, envelope_len);
+		SUIT_DBG("Decode envelope: %p (%d)\r\n", (void *)envelope_str, envelope_len);
 		ret = suit_decoder_decode_envelope(decoder_state, envelope_str, envelope_len);
 	}
 
@@ -121,11 +121,11 @@ int suit_processor_load_envelope(struct suit_processor_state *state, uint8_t *en
 	}
 
 	if (state->manifest_stack_height >= ZCBOR_ARRAY_SIZE(state->manifest_stack)) {
-		SUIT_ERR("Unable to load manifest: %p. Stack too small (%d).\r\n", envelope_str, state->manifest_stack_height);
+		SUIT_ERR("Unable to load manifest: %p. Stack too small (%d).\r\n", (void *)envelope_str, state->manifest_stack_height);
 		return SUIT_ERR_OVERFLOW;
 	}
 
-	SUIT_DBG("Parse manifest: %p (%d)\r\n", envelope_str, envelope_len);
+	SUIT_DBG("Parse manifest: %p (%d)\r\n", (void *)envelope_str, envelope_len);
 	manifest_state = &state->manifest_stack[state->manifest_stack_height];
 	retval = suit_processor_decode_envelope(
 		&state->decoder_state,
@@ -185,7 +185,7 @@ int suit_process_sequence(uint8_t *envelope_str, size_t envelope_len, enum suit_
 
 	state->current_seq = seq_name;
 
-	SUIT_DBG("Decode manifest: %p (%d)\r\n", envelope_str, envelope_len);
+	SUIT_DBG("Decode manifest: %p (%d)\r\n", (void *)envelope_str, envelope_len);
 	manifest_state = &state->manifest_stack[state->manifest_stack_height];
 
 	ret = suit_processor_load_envelope(state, envelope_str, envelope_len);

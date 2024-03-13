@@ -157,6 +157,157 @@ static inline int suit_validate_single_common_command(struct suit_processor_stat
 	return suit_validate_single_command(state, command, false);
 }
 
+static uint32_t prepare_report(struct suit_processor_state *state, suit_command_t *command, struct suit_manifest_params *params, struct suit_report *report)
+{
+	struct suit_seq_exec_state *seq_exec_state = NULL;
+	uint32_t rep_policy = 0;
+
+	if ((state == NULL) || (command == NULL) || (params == NULL) || (report == NULL)) {
+		return rep_policy;
+	}
+
+	memset(report, 0, sizeof(*report));
+
+	int retval = suit_seq_exec_state_get(state, &seq_exec_state);
+	if (retval != SUIT_SUCCESS) {
+		return 0;
+	}
+
+	report->argv[0].arg_id = _SUIT_Parameters_suit_parameter_soft_failure;
+	report->argv[0].arg.uint = (seq_exec_state->soft_failure == suit_bool_false ? 0 : 1);
+	report->nargs = 1;
+
+	if (command->type == SUIT_COMMAND_CONDITION) {
+		report->command = command->condition._SUIT_Condition_choice;
+
+		switch (command->condition._SUIT_Condition_choice) {
+		case _SUIT_Condition___suit_condition_vendor_identifier:
+			rep_policy = command->condition._SUIT_Condition___suit_condition_vendor_identifier__SUIT_Rep_Policy;
+			if (params->vid_set) {
+				report->argv[1].arg_id = _SUIT_Parameters_suit_parameter_vendor_identifier;
+				report->argv[1].arg.bstr = params->vid;
+				report->nargs = 2;
+			}
+			break;
+		case _SUIT_Condition___suit_condition_class_identifier:
+			rep_policy = command->condition._SUIT_Condition___suit_condition_class_identifier__SUIT_Rep_Policy;
+			if (params->cid_set) {
+				report->argv[1].arg_id = _SUIT_Parameters_suit_parameter_class_identifier;
+				report->argv[1].arg.bstr = params->cid;
+				report->nargs = 2;
+			}
+			break;
+		case _SUIT_Condition___suit_condition_device_identifier:
+			rep_policy = command->condition._SUIT_Condition___suit_condition_device_identifier__SUIT_Rep_Policy;
+			if (params->did_set) {
+				report->argv[1].arg_id = _SUIT_Parameters_suit_parameter_device_identifier;
+				report->argv[1].arg.bstr = params->did;
+				report->nargs = 2;
+			}
+			break;
+		case _SUIT_Condition___suit_condition_image_match:
+			rep_policy = command->condition._SUIT_Condition___suit_condition_image_match__SUIT_Rep_Policy;
+			if (params->image_digest_set) {
+				report->argv[1].arg_id = _SUIT_Parameters_suit_parameter_image_digest;
+				report->argv[1].arg.bstr = params->image_digest;
+				report->nargs = 2;
+			}
+			break;
+		case _SUIT_Condition___suit_condition_component_slot:
+			rep_policy = command->condition._SUIT_Condition___suit_condition_component_slot__SUIT_Rep_Policy;
+			if (params->component_slot_set) {
+				report->argv[1].arg_id = _SUIT_Parameters_suit_parameter_component_slot;
+				report->argv[1].arg.uint = params->component_slot;
+				report->nargs = 2;
+			}
+			break;
+		case _SUIT_Condition___suit_condition_check_content:
+			rep_policy = command->condition._SUIT_Condition___suit_condition_check_content__SUIT_Rep_Policy;
+			if (params->content_set) {
+				report->argv[1].arg_id = _SUIT_Parameters_suit_parameter_content;
+				report->argv[1].arg.bstr = params->content;
+				report->nargs = 2;
+			}
+			break;
+		case _SUIT_Condition___suit_condition_abort:
+			rep_policy = command->condition._SUIT_Condition___suit_condition_abort__SUIT_Rep_Policy;
+			break;
+		case _SUIT_Condition___suit_condition_dependency_integrity:
+			rep_policy = command->condition._SUIT_Condition___suit_condition_dependency_integrity__SUIT_Rep_Policy;
+			report->argv[1].arg_id = SUIT_PARAMETER_REPORT_EXEC_STATE;
+			report->argv[1].arg.uint = seq_exec_state->cmd_exec_state;
+			report->nargs = 2;
+			break;
+		case _SUIT_Condition___suit_condition_is_dependency:
+			rep_policy = command->condition._SUIT_Condition___suit_condition_is_dependency__SUIT_Rep_Policy;
+			break;
+		default:
+			break;
+		}
+	}
+
+	else if (command->type == SUIT_COMMAND_DIRECTIVE) {
+		report->command = command->directive._SUIT_Directive_choice;
+
+		switch (command->directive._SUIT_Directive_choice) {
+		case _SUIT_Directive___suit_directive_process_dependency:
+			rep_policy = command->directive._SUIT_Directive___suit_directive_process_dependency__SUIT_Rep_Policy;
+			report->argv[1].arg_id = SUIT_PARAMETER_REPORT_EXEC_STATE;
+			report->argv[1].arg.uint = seq_exec_state->cmd_exec_state;
+			report->nargs = 2;
+			break;
+		case _SUIT_Directive___suit_directive_copy:
+			rep_policy = command->directive._SUIT_Directive___suit_directive_copy__SUIT_Rep_Policy;
+			if (params->source_component_set) {
+				report->argv[1].arg_id = _SUIT_Parameters_suit_parameter_source_component;
+				report->argv[1].arg.uint = params->source_component;
+				report->nargs = 2;
+			}
+			break;
+		case _SUIT_Directive___suit_directive_write:
+			rep_policy = command->directive._SUIT_Directive___suit_directive_write__SUIT_Rep_Policy;
+			if (params->content_set) {
+				report->argv[1].arg_id = _SUIT_Parameters_suit_parameter_content;
+				report->argv[1].arg.bstr = params->content;
+				report->nargs = 2;
+			}
+			break;
+		case _SUIT_Directive___suit_directive_invoke:
+			rep_policy = command->directive._SUIT_Directive___suit_directive_invoke__SUIT_Rep_Policy;
+			if (params->invoke_args_set) {
+				report->argv[1].arg_id = _SUIT_Parameters_suit_parameter_invoke_args;
+				report->argv[1].arg.bstr = params->invoke_args;
+				report->nargs = 2;
+			}
+			break;
+		case _SUIT_Directive___suit_directive_fetch:
+			rep_policy = command->directive._SUIT_Directive___suit_directive_fetch__SUIT_Rep_Policy;
+			if (params->uri_set) {
+				report->argv[1].arg_id = _SUIT_Parameters_suit_parameter_uri;
+				report->argv[1].arg.bstr = params->uri;
+				report->nargs = 2;
+			}
+			break;
+		case _SUIT_Directive___suit_directive_run_sequence:
+		case _SUIT_Directive___suit_directive_try_each:
+		case _SUIT_Directive___suit_directive_set_parameters:
+		default:
+			break;
+		}
+	}
+
+	report->component_handle = params->component_handle;
+
+	report->manifest_section = state->current_seq;
+	report->current_component_idx = seq_exec_state->current_component_idx;
+	report->section_offset = ((uintptr_t)seq_exec_state->exec_ptr) - ((uintptr_t)state->seq_stack[0].cmd_seq_str.value);
+
+	struct suit_manifest_state *manifest_state = &state->manifest_stack[state->manifest_stack_height - 1];
+	report->manifest_digest = manifest_state->manifest_digest;
+
+	return rep_policy;
+}
+
 static int suit_run_single_command(struct suit_processor_state *state, suit_command_t *command)
 {
 	struct suit_seq_exec_state *seq_exec_state;
@@ -288,7 +439,14 @@ static int suit_run_single_command(struct suit_processor_state *state, suit_comm
 
 		/* Command finished - execute it for the next component. */
 		if (retval != SUIT_ERR_AGAIN) {
-			int ret = suit_seq_exec_component_idx_next(seq_exec_state, &component_idx);
+			struct suit_report report;
+			uint32_t rep_policy = prepare_report(state, command, params, &report);
+			report.result = retval;
+
+			int ret = suit_plat_report(rep_policy, &report);
+			if (ret == SUIT_SUCCESS) {
+				ret = suit_seq_exec_component_idx_next(seq_exec_state, &component_idx);
+			}
 			if (ret != SUIT_SUCCESS) {
 				retval = ret;
 			} else if (component_idx != SUIT_MAX_NUM_COMPONENTS) {

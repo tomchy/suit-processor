@@ -361,6 +361,8 @@ int suit_decoder_decode_envelope(struct suit_decoder_state *state, uint8_t *enve
 
 			state->decoded_manifest->envelope_str.value = envelope_str;
 			state->decoded_manifest->envelope_str.len = decoded_len;
+			state->decoded_manifest->manifest_digest = state->manifest_digest_bytes;
+
 			state->step = ENVELOPE_DECODED;
 			return SUIT_SUCCESS;
 		}

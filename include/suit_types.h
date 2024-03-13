@@ -20,7 +20,7 @@ extern "C" {
 #define SUIT_MAX_NUM_COMPONENTS 5  ///! The maximum number of components referenced in the manifest.
 #define SUIT_MAX_NUM_COMPONENT_PARAMS (SUIT_MAX_NUM_COMPONENTS * SUIT_MANIFEST_STACK_MAX_ENTRIES) ///! The maximum number of active components during processing dependency manifests.
 #define SUIT_MAX_NUM_INTEGRATED_PAYLOADS 5  ///! The maximum number of integrated payloads in a single manifest.
-#define SUIT_MAX_COMMAND_ARGS 3  ///! The maximum number of arguments consumed by a single command.
+#define SUIT_MAX_COMMAND_ARGS 2  ///! The maximum number of arguments consumed by a single command.
 #define SUIT_SUIT_SIG_STRUCTURE1_MAX_LENGTH 95  ///! The maximum length of the Sig_structure1 structure. Current value allows to store up to 512-bit long digests with 32-bit key id.
 #define SUIT_MAX_SEQ_DEPTH 5  ///! The maximum number of command sequences that may be encapsulated.
 #define SUIT_SEQ_EXEC_DEFAULT_STATE 0  ///! The default value of the cmd_exec_state.
@@ -63,6 +63,8 @@ extern "C" {
 #define SUIT_ZCBOR_ERR_OFFSET 128
 #define ZCBOR_ERR_TO_SUIT_ERR(zcbor_err) ((zcbor_err) + SUIT_ZCBOR_ERR_OFFSET)
 
+#define SUIT_PARAMETER_REPORT_EXEC_STATE -1 ///! Current command execution state custom parameter ID.
+
 typedef intptr_t suit_component_t; ///! Handle to more easily refer to a component.
 
 enum suit_command_sequence {
@@ -88,17 +90,20 @@ enum suit_cose_alg {
 };
 
 struct suit_arg {
-	union{struct zcbor_string *bstr; unsigned int uint; } arg;
-	enum{bstr, uint} arg_type;
+	union{struct zcbor_string bstr; unsigned int uint; } arg; ///! SUIT parameter value.
+	int arg_id; ///! SUIT parameter identifier.
 };
 
 struct suit_report {
-	int result;
-	suit_component_t component_handle;
-	unsigned int command; ///! The identifier of the condition or directive
-	struct suit_arg argv[SUIT_MAX_COMMAND_ARGS];
-	size_t nargs;
-	struct zcbor_string *addititional_info;
+	enum suit_command_sequence manifest_section; ///! Currently executed command sequence.
+	uintptr_t section_offset; ///! Offset in the current command sequence binary.
+	size_t current_component_idx; ///! Index in the current component list of the active component.
+	struct zcbor_string manifest_digest; ///! Reference to the current manifest digest value.
+	int result; ///! Return code of the last command.
+	suit_component_t component_handle; ///! Platform-specific current component handle.
+	unsigned int command; ///! The identifier of the condition or directive.
+	struct suit_arg argv[SUIT_MAX_COMMAND_ARGS]; ///! Command argument list (parameters).
+	size_t nargs; ///! Length of the command argument list.
 };
 
 

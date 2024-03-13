@@ -139,6 +139,7 @@ struct suit_integrated_payload {
 struct suit_manifest_state {
 	struct zcbor_string envelope_str;
 	struct zcbor_string manifest_component_id;
+	struct zcbor_string manifest_digest;
 	uint32_t sequence_number;
 
 	struct suit_integrated_payload integrated_payloads[SUIT_MAX_NUM_INTEGRATED_PAYLOADS];

@@ -116,3 +116,4 @@ target_link_libraries(suit PUBLIC cose)
 
 # Canonical mode is required to encode the Signature1 structure correctly
 add_compile_definitions(ZCBOR_CANONICAL)
+target_link_libraries(suit PUBLIC suit_gpio_debug)

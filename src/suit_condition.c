@@ -11,6 +11,7 @@
 #include <suit_schedule_seq.h>
 #include <suit_manifest.h>
 #include <suit.h>
+#include <suit_gpio_debug.h>
 
 
 enum comparison_type {
@@ -277,6 +278,7 @@ int suit_condition_dependency_integrity(struct suit_processor_state *state,
 	manifest_state = &state->manifest_stack[state->manifest_stack_height - 1];
 
 	if (seq_exec_state->cmd_exec_state == SUIT_SEQ_EXEC_DEFAULT_STATE) {
+		suit_gpio_debug_toggle(SUIT_GPIO_CMD_DEP_INTEGRITY_PART);
 		/** Return a pointer to the manifest contents, stored inside the component. */
 		retval = suit_plat_retrieve_manifest(component_params->component_handle, &envelope_str, &envelope_len);
 
@@ -284,6 +286,7 @@ int suit_condition_dependency_integrity(struct suit_processor_state *state,
 			retval = suit_processor_load_envelope(state, envelope_str, envelope_len);
 		}
 
+		suit_gpio_debug_toggle(SUIT_GPIO_CMD_DEP_INTEGRITY_PART);
 		if (retval == SUIT_SUCCESS) {
 			SUIT_DBG("Validate sequences\r\n");
 			seq_exec_state->cmd_exec_state = SUIT_SEQ_SHARED;
@@ -296,6 +299,7 @@ int suit_condition_dependency_integrity(struct suit_processor_state *state,
 		}
 
 	} else if ((seq_exec_state->cmd_exec_state >= SUIT_SEQ_SHARED) && (seq_exec_state->cmd_exec_state < SUIT_SEQ_MAX)) {
+		suit_gpio_debug_toggle(SUIT_GPIO_CMD_DEP_INTEGRITY_PART);
 		if (seq_exec_state->retval != SUIT_SUCCESS) {
 			/* Any issue in validation of the manifest should fail the condition, not the processing. */
 			retval = SUIT_FAIL_CONDITION;
@@ -323,6 +327,7 @@ int suit_condition_dependency_integrity(struct suit_processor_state *state,
 			seq_exec_state->retval = SUIT_FAIL_CONDITION;
 		}
 
+		suit_gpio_debug_toggle(SUIT_GPIO_CMD_DEP_INTEGRITY_PART);
 		retval = seq_exec_state->retval;
 	}
 
@@ -331,6 +336,7 @@ int suit_condition_dependency_integrity(struct suit_processor_state *state,
 		/* Remove the checked manifest from the stack */
 		int ret = suit_manifest_release(manifest_state);
 
+		suit_gpio_debug_toggle(SUIT_GPIO_CMD_DEP_INTEGRITY_PART);
 		/* Do not allow component release to spread over more than one iteration. */
 		if (ret == SUIT_ERR_AGAIN) {
 			ret = SUIT_ERR_CRASH;

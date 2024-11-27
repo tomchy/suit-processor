@@ -10,6 +10,7 @@
 #include <suit_manifest.h>
 #include <suit_schedule_seq.h>
 #include <manifest_decode.h>
+#include <suit_gpio_debug.h>
 
 static struct suit_processor_state processor_state;
 static struct suit_processor_state *state = &processor_state;
@@ -160,6 +161,8 @@ int suit_processor_load_envelope(struct suit_processor_state *state, const uint8
 		return SUIT_ERR_OVERFLOW;
 	}
 
+	suit_gpio_debug_toggle(SUIT_GPIO_LOAD_ENVELOPE);
+	suit_gpio_debug_toggle(SUIT_GPIO_LOAD_ENVELOPE_PART);
 	SUIT_DBG("Parse manifest: %p (%d)\r\n", envelope_str, envelope_len);
 	manifest_state = &state->manifest_stack[state->manifest_stack_height];
 	retval = suit_processor_decode_envelope(
@@ -167,26 +170,31 @@ int suit_processor_load_envelope(struct suit_processor_state *state, const uint8
 		manifest_state,
 		envelope_str, envelope_len);
 
+	suit_gpio_debug_toggle(SUIT_GPIO_LOAD_ENVELOPE_PART);
 	if (retval == SUIT_SUCCESS) {
 		SUIT_DBG("Authenticate manifest digest\r\n");
 		retval = suit_decoder_authenticate_manifest(&state->decoder_state);
 	}
 
+	suit_gpio_debug_toggle(SUIT_GPIO_LOAD_ENVELOPE_PART);
 	if (retval == SUIT_SUCCESS) {
 		SUIT_DBG("Authorize manifest\r\n");
 		retval = suit_decoder_authorize_manifest(&state->decoder_state);
 	}
 
+	suit_gpio_debug_toggle(SUIT_GPIO_LOAD_ENVELOPE_PART);
 	if (retval == SUIT_SUCCESS) {
 		SUIT_DBG("Decode sequences\r\n");
 		retval = suit_decoder_decode_sequences(&state->decoder_state);
 	}
 
+	suit_gpio_debug_toggle(SUIT_GPIO_LOAD_ENVELOPE_PART);
 	if (retval == SUIT_SUCCESS) {
 		SUIT_DBG("Create component handles\r\n");
 		retval = suit_decoder_create_components(&state->decoder_state);
 	}
 
+	suit_gpio_debug_toggle(SUIT_GPIO_LOAD_ENVELOPE_PART);
 	if (retval == SUIT_SUCCESS) {
 		state->manifest_stack_height++;
 		SUIT_DBG("Authorize sequence number: %d for sequence: %d\r\n", manifest_state->sequence_number, state->current_seq);
@@ -196,11 +204,14 @@ int suit_processor_load_envelope(struct suit_processor_state *state, const uint8
 			&manifest_state->manifest_component_id,
 			manifest_state->sequence_number);
 
+		suit_gpio_debug_toggle(SUIT_GPIO_LOAD_ENVELOPE_PART);
 		if (retval != SUIT_SUCCESS) {
 			(void)suit_manifest_release(manifest_state);
 			state->manifest_stack_height--;
 		}
+		suit_gpio_debug_toggle(SUIT_GPIO_LOAD_ENVELOPE_PART);
 	}
+	suit_gpio_debug_toggle(SUIT_GPIO_LOAD_ENVELOPE);
 
 	if (retval != SUIT_SUCCESS) {
 		SUIT_ERR("Failed to load manifest\r\n");
@@ -223,7 +234,9 @@ int suit_process_sequence(const uint8_t *envelope_str, size_t envelope_len, enum
 	SUIT_DBG("Decode manifest: %p (%d)\r\n", envelope_str, envelope_len);
 	manifest_state = &state->manifest_stack[state->manifest_stack_height];
 
+	suit_gpio_debug_toggle(SUIT_GPIO_MFST_SEQ_EXEC_PART);
 	ret = suit_processor_load_envelope(state, envelope_str, envelope_len);
+	suit_gpio_debug_toggle(SUIT_GPIO_MFST_SEQ_EXEC_PART);
 
 	if (ret == SUIT_SUCCESS) {
 		SUIT_DBG("Validate sequences\r\n");
@@ -252,6 +265,7 @@ int suit_process_sequence(const uint8_t *envelope_str, size_t envelope_len, enum
 
 		SUIT_DBG("Manifest validation finished\r\n");
 
+		suit_gpio_debug_toggle(SUIT_GPIO_MFST_SEQ_EXEC_PART);
 #ifdef SUIT_PLATFORM_DRY_RUN_SUPPORT
 		/* Do not execute dry run while booting.
 		 * The main purpose for dry run is to prevalidate manifest before it is installed.
@@ -267,6 +281,7 @@ int suit_process_sequence(const uint8_t *envelope_str, size_t envelope_len, enum
 			state->dry_run = suit_bool_false;
 		}
 #endif /* SUIT_PLATFORM_DRY_RUN_SUPPORT */
+		suit_gpio_debug_toggle(SUIT_GPIO_MFST_SEQ_EXEC_PART);
 	} else {
 		manifest_state = NULL;
 	}
@@ -316,11 +331,13 @@ int suit_process_sequence(const uint8_t *envelope_str, size_t envelope_len, enum
 				manifest_state->envelope_str.len);
 		}
 	}
+	suit_gpio_debug_toggle(SUIT_GPIO_MFST_SEQ_EXEC_PART);
 
 	if (manifest_state != NULL) {
 		(void)suit_manifest_release(manifest_state);
 		state->manifest_stack_height--;
 	}
+	suit_gpio_debug_toggle(SUIT_GPIO_MFST_SEQ_EXEC_PART);
 
 	return ret;
 }

@@ -12,6 +12,7 @@
 #include <suit_schedule_seq.h>
 #include <cose_encode.h>
 #include <cose_decode.h>
+#include <suit_gpio_debug.h>
 
 
 static const uint8_t suit_aad_aes256_gcm[] = {
@@ -487,6 +488,7 @@ int suit_directive_process_dependency(struct suit_processor_state *state, struct
 		}
 
 	} else if (seq_exec_state->cmd_exec_state == SUIT_SEQ_EXEC_DEFAULT_STATE) {
+		suit_gpio_debug_toggle(SUIT_GPIO_CMD_PROCESS_DEP_PART);
 		/** Return a pointer to the manifest contents, stored inside the component. */
 		retval = suit_plat_retrieve_manifest(component_params->component_handle, &envelope_str, &envelope_len);
 
@@ -504,6 +506,7 @@ int suit_directive_process_dependency(struct suit_processor_state *state, struct
 				state->current_seq);
 		}
 
+		suit_gpio_debug_toggle(SUIT_GPIO_CMD_PROCESS_DEP_PART);
 		if (retval == SUIT_SUCCESS) {
 			SUIT_DBG("Validate sequences\r\n");
 			seq_exec_state->retval = SUIT_SUCCESS;
@@ -517,6 +520,7 @@ int suit_directive_process_dependency(struct suit_processor_state *state, struct
 		}
 
 	} else if ((seq_exec_state->cmd_exec_state >= SUIT_SEQ_SHARED) && (seq_exec_state->cmd_exec_state < SUIT_SEQ_MAX)) {
+		suit_gpio_debug_toggle(SUIT_GPIO_CMD_PROCESS_DEP_PART);
 		seq_exec_state->retval = suit_schedule_validation(state, manifest_state, seq_exec_state->cmd_exec_state);
 		if ((seq_exec_state->retval == SUIT_ERR_UNAUTHORIZED_COMMAND_SEQ) && (seq_exec_state->cmd_exec_state != state->current_seq)) {
 			/* Since this loop goes through all possible sequences, mask error that indicates missing,
@@ -531,6 +535,7 @@ int suit_directive_process_dependency(struct suit_processor_state *state, struct
 		seq_exec_state->cmd_exec_state++;
 
 	} else if (seq_exec_state->cmd_exec_state == SUIT_SEQ_MAX) {
+		suit_gpio_debug_toggle(SUIT_GPIO_CMD_PROCESS_DEP_PART);
 		seq_exec_state->retval = suit_schedule_execution(state, manifest_state, SUIT_SEQ_SHARED);
 		SUIT_DBG("Shared sequence scheduled\r\n");
 
@@ -538,6 +543,7 @@ int suit_directive_process_dependency(struct suit_processor_state *state, struct
 		seq_exec_state->cmd_exec_state++;
 
 	} else if (seq_exec_state->cmd_exec_state == SUIT_SEQ_MAX + 1) {
+		suit_gpio_debug_toggle(SUIT_GPIO_CMD_PROCESS_DEP_PART);
 		seq_exec_state->retval = suit_schedule_execution(state, manifest_state, state->current_seq);
 		if (seq_exec_state->retval == SUIT_ERR_UNAVAILABLE_COMMAND_SEQ) {
 			SUIT_DBG("Command sequence unavailable\r\n");
@@ -550,6 +556,7 @@ int suit_directive_process_dependency(struct suit_processor_state *state, struct
 		seq_exec_state->cmd_exec_state++;
 
 	} else if (seq_exec_state->cmd_exec_state == SUIT_SEQ_MAX + 2) {
+		suit_gpio_debug_toggle(SUIT_GPIO_CMD_PROCESS_DEP_PART);
 		if (seq_exec_state->retval == SUIT_SUCCESS) {
 			seq_exec_state->retval = suit_plat_sequence_completed(state->current_seq,
 				&manifest_state->manifest_component_id,
@@ -573,6 +580,7 @@ int suit_directive_process_dependency(struct suit_processor_state *state, struct
 			ret = SUIT_ERR_CRASH;
 		}
 
+		suit_gpio_debug_toggle(SUIT_GPIO_CMD_PROCESS_DEP_PART);
 		state->manifest_stack_height--;
 		if (retval == SUIT_SUCCESS) {
 			seq_exec_state->retval = ret;
